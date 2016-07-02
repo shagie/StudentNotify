@@ -1,0 +1,13 @@
+id:
+  001
+grades:
+  -
+    reading: A
+    writing: A
+    math: A
+  -
+    reading: A
+    writing: A
+    math: A
+name:
+  Albert

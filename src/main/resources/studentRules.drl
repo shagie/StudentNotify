@@ -1,0 +1,17 @@
+
+dialect  "mvel"
+
+import net.shagie.studentnotify.data.Student
+import net.shagie.studentnotify.data.Semester
+import net.shagie.studentnotify.data.Grade
+import java.util.List
+
+
+rule "straight A's"
+    when
+        $s : Student(grades != null, !grades.empty)
+        List(size == $s.grades.size()) from collect
+            (Semester(reading == Grade.A, writing == Grade.A, math == Grade.A) from $s.grades)
+    then
+        System.out.println($s.getId() + ": Straight A's");
+end
