@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Student {
-    private String id;
-    private List<Semester> grades;
-    private String name;
-    private Map<String, List<Integer>> notifications;
+    public String id;
+    public List<Semester> grades;
+    public String name;
+    public Map<String, List<Integer>> notifications;
 
     public Student() {
     }

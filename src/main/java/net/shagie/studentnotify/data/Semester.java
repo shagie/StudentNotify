@@ -1,9 +1,9 @@
 package net.shagie.studentnotify.data;
 
 public class Semester {
-    private Grade reading;
-    private Grade writing;
-    private Grade math;
+    public Grade reading;
+    public Grade writing;
+    public Grade math;
 
     public Semester() {
     }

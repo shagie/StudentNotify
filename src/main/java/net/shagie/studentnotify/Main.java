@@ -9,8 +9,9 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,7 +24,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        builder.add(ResourceFactory.newClassPathResource("studentRules.drl"), ResourceType.DRL);
+        builder.add(ResourceFactory.newClassPathResource("net/shagie/studentnotify/rules/studentRules.drl"), ResourceType.DRL);
         if (builder.hasErrors()) {
             throw new RuntimeException(builder.getErrors().toString());
         }
@@ -31,16 +32,27 @@ public class Main {
         KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
         knowledgeBase.addKnowledgePackages(builder.getKnowledgePackages());
 
-        StatefulKnowledgeSession session = knowledgeBase.newStatefulKnowledgeSession();
-
         for(Student student : getAllStudents()) {
-            FactHandle studentFact = session.insert(student);
-            session.fireAllRules();
-            System.out.println();
+            List<String> notifications = new ArrayList<>();
+
+            StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
+            ksession.setGlobal("notifications", notifications);
+//            ksession.addEventListener( new DebugAgendaEventListener() );
+//            ksession.addEventListener( new DebugWorkingMemoryEventListener() );
+
+            KnowledgeRuntimeLogger logger =
+                    KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getId());
+
+            ksession.insert(student);
+            ksession.fireAllRules();
+
+            for(String notification : notifications) {
+                System.out.println(notification);
+            }
+            System.out.println("----------------");
+            logger.close();
+            ksession.dispose();
         }
-
-        session.dispose();
-
     }
 
     private static List<Student> getAllStudents()  {
