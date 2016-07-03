@@ -2,33 +2,25 @@ package net.shagie.studentnotify.rules
 
 import net.shagie.studentnotify.data.Student
 import net.shagie.studentnotify.data.Semester
-import net.shagie.studentnotify.data.Grade
-import java.util.List
+import java.util.ArrayList
 
 global java.util.List notifications;
 
-function Semester lastSemester(List sem) {
-    return (Semester)sem.get(sem.size() - 1);
-}
+////////////
 
 rule "straight As"
     when
-        $s : Student(grades != null, !grades.empty)
-        List(size == $s.grades.size()) from collect
-            (Semester(reading == Grade.A, writing == Grade.A, math == Grade.A) from $s.grades)
+        $s : Student(grades != null, !grades.empty, $g : grades)
+        $a : ArrayList() from collect
+            ( Semester( reading == "A" ) from $g )
     then
-        System.out.println($s.getId() + ": Straight As");
+        System.out.println($s.getId() + ": semesters: " + $g.size());
+        System.out.println($s.getId() + " : " + $g);
+        System.out.println($s.getId() + ": not As: " + $a.size());
         notifications.add("allAs");
 end
 
-rule "last Semester all As"
-    when
-        $s : Student(getGrades() != null)
-        $y : lastSemester($s.grades)
-    then
-        System.out.println($s.getId() + ": last semester As: ");
-        notifications.add("lastSem");
-end
+////////////
 
 rule "enrolled"
     when
@@ -37,10 +29,11 @@ rule "enrolled"
         notifications.add("enrolled " + $s.getName());
 end
 
+////////////
+
 rule "last semester"
     when
         $s : Student(getGrades() != null)
     then
         notifications.add("there: " + $s.getGrades().get($s.getGrades().size() - 1));
-
 end
