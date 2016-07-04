@@ -1,40 +1,40 @@
 package net.shagie.studentnotify.data;
 
 public class Semester {
-    private String reading;
-    private String writing;
-    private String math;
+    private Grade reading;
+    private Grade writing;
+    private Grade math;
 
     public Semester() {
     }
 
-    public Semester(String reading, String writing, String math) {
+    public Semester(Grade reading, Grade writing, Grade math) {
         this.reading = reading;
         this.writing = writing;
         this.math = math;
     }
 
-    public String getReading() {
+    public Grade getReading() {
         return reading;
     }
 
-    public void setReading(String reading) {
+    public void setReading(Grade reading) {
         this.reading = reading;
     }
 
-    public String getWriting() {
+    public Grade getWriting() {
         return writing;
     }
 
-    public void setWriting(String writing) {
+    public void setWriting(Grade writing) {
         this.writing = writing;
     }
 
-    public String getMath() {
+    public Grade getMath() {
         return math;
     }
 
-    public void setMath(String math) {
+    public void setMath(Grade math) {
         this.math = math;
     }
 
