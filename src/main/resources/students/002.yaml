@@ -1,7 +1,8 @@
+!net.shagie.studentnotify.data.Student
 id:
   002
 grades:
-  -
+  - !net.shagie.studentnotify.data.Semester
     reading: B
     writing: B
     math: B

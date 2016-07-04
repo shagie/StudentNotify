@@ -1,11 +1,12 @@
+!net.shagie.studentnotify.data.Student
 id:
   001
 grades:
-  -
+  - !net.shagie.studentnotify.data.Semester
     reading: A
     writing: A
     math: A
-  -
+  - !net.shagie.studentnotify.data.Semester
     reading: A
     writing: A
     math: A
