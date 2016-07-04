@@ -2,6 +2,7 @@ package net.shagie.studentnotify.rules
 
 import net.shagie.studentnotify.data.Student
 import net.shagie.studentnotify.data.Notification
+import net.shagie.studentnotify.data.NotifyIds
 
 global java.util.List notifications;
 
@@ -14,9 +15,8 @@ dialect "mvel"
 rule "enrolled Null"
     when
         $s : Student( notifications == null || notifications.isEmpty() )
-
     then
-        notifications.add(new Notification(1,
+        notifications.add(new Notification(NotifyIds.ENROLL,
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "enrolled " + $s.getName()));
 end
@@ -24,9 +24,9 @@ end
 rule "enrolled NoPrevious"
     when
         $s : Student( notifications != null, !notifications.isEmpty(), $n : notifications )
-        not Notification(id == 1) from $n
+        not Notification(id == NotifyIds.ENROLL) from $n
     then
-        notifications.add(new Notification(1,
+        notifications.add(new Notification(NotifyIds.ENROLL,
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "enrolled " + $s.getName()));
 end

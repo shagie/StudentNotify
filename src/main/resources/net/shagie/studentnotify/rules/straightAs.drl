@@ -3,6 +3,7 @@ package net.shagie.studentnotify.rules
 import net.shagie.studentnotify.data.Student
 import net.shagie.studentnotify.data.Semester
 import net.shagie.studentnotify.data.Notification
+import net.shagie.studentnotify.data.NotifyIds
 import java.util.*
 
 global java.util.List notifications;
@@ -19,9 +20,9 @@ rule "straight As"
             $n : notifications
         )
         not Semester(reading != "A" || writing != "A" || math != "A") from $g
-        not Notification(id == 2, semester == $g.size()) from $n
+        not Notification(id == NotifyIds.STRAIGHT_AS, semester == $g.size()) from $n
     then
-        notifications.add(new Notification(2,
+        notifications.add(new Notification(NotifyIds.STRAIGHT_AS,
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "allAs " + $s.getName()));
 end
