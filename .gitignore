@@ -3,3 +3,4 @@
 /out/
 .idea_modules/
 log/*.log
+target/
