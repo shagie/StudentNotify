@@ -32,7 +32,6 @@ public class Main {
             builder.add(ResourceFactory.newClassPathResource(RULE_PACKAGE + ruleFile), ResourceType.DRL);
         }
 
-        builder.add(ResourceFactory.newClassPathResource("net/shagie/studentnotify/rules/lastSemester.drl"), ResourceType.DRL);
         if (builder.hasErrors()) {
             throw new RuntimeException(builder.getErrors().toString());
         }
