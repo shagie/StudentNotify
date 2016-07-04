@@ -1,18 +1,50 @@
 package net.shagie.studentnotify.rules
 
 import net.shagie.studentnotify.data.Student
+import net.shagie.studentnotify.data.Semester
+import net.shagie.studentnotify.data.Notification
+import net.shagie.studentnotify.data.NotifyIds
 
 global java.util.List notifications;
 
 dialect "mvel"
+
+/* Rules related to the last semester.
+ * GPA triggers every year and notifies the gpa
+ * Sports elgibility triggers every year.
+ *   - Must have all Cs or better
+ *   - Must have a GPA at least 2.5
+ */
 
 rule "last semester"
     when
         $s : Student(
             grades != null,
             $g : grades,
-            $l : grades.get(grades.size() - 1)
+            $l : grades.get(grades.size() - 1),
+            $n : notifications
         )
+        not Notification(id == NotifyIds.GPA, semester == $g.size()) from $n
+        Semester( $gpa : ((reading.score + writing.score + math.score) / 3)) from $l
     then
-        System.out.println("last semester: " + $l);
+        notifications.add(new Notification(NotifyIds.GPA,
+            ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
+            "gpa " + $gpa));
+end
+
+rule "sports eligibility"
+    when
+        $s : Student(
+            grades != null,
+            $g : grades,
+            $l : grades.get(grades.size() - 1),
+            $n : notifications
+        )
+        not Notification(id == NotifyIds.SPORTS_ELIGIBILITY, semester == $g.size()) from $n
+        Semester ( ((reading.score + writing.score + math.score) / 3) > 2.5 ) from $l
+        Semester ( reading.score > 1, writing.score > 1, math.score > 1 ) from $l
+    then
+        notifications.add(new Notification(NotifyIds.SPORTS_ELIGIBILITY,
+            ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
+            "sports eligibility " + $s.getName()));
 end
