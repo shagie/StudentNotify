@@ -52,6 +52,7 @@ public class Main {
                     KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getId());
 
             ksession.insert(student);
+            System.out.println("Student: " + student.getId() + " " + student.getName());
             ksession.fireAllRules();
 
             for(Notification notification : notifications) {
