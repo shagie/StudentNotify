@@ -6,6 +6,7 @@ public class Student {
     private String id;
     private List<Semester> grades;
     private String name;
+    private List<Notification> notifications;
 
     public Student() {
     }
@@ -34,12 +35,21 @@ public class Student {
         this.grades = grades;
     }
 
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
                 "id='" + id + '\'' +
                 ", grades=" + grades +
                 ", name='" + name + '\'' +
+                ", notifications=" + notifications +
                 '}';
     }
 }

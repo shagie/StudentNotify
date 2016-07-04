@@ -7,9 +7,9 @@ grades:
     writing: B
     math: B
 name:
-  Bob
+  Transfer
 notifications:
   - !net.shagie.studentnotify.data.Notification
-    id: 1
+    id: 3
     semester: 1
-    message: enrolled
+    message: transfer

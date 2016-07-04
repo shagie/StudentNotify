@@ -1,0 +1,18 @@
+package net.shagie.studentnotify.rules
+
+import net.shagie.studentnotify.data.Student
+
+global java.util.List notifications;
+
+dialect "mvel"
+
+rule "last semester"
+    when
+        $s : Student(
+            grades != null,
+            $g : grades,
+            $l : grades.get(grades.size() - 1)
+        )
+    then
+        System.out.println("last semester: " + $l);
+end
