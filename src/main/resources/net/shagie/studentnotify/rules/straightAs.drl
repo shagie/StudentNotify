@@ -11,14 +11,15 @@ dialect "mvel"
 
 /* Triggers every semester as long as the student maintains all As */
 
-
 rule "straight As"
     when
         $s : Student(
             grades != null,
-            $g : grades
+            $g : grades,
+            $n : notifications
         )
         not Semester(reading != "A" || writing != "A" || math != "A") from $g
+        not Notification(id == 2, semester == $g.size()) from $n
     then
         notifications.add(new Notification(2,
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
