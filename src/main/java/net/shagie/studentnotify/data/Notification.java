@@ -1,25 +1,35 @@
 package net.shagie.studentnotify.data;
 
 public class Notification {
-    private int id;
+    private int notificationType;
+    private String student;
     private int semester;
     private String message;
 
     public Notification() {
     }
 
-    public Notification(int id, int semester, String message) {
-        this.id = id;
+    public Notification(int notificationType, String student, int semester, String message) {
+        this.notificationType = notificationType;
+        this.student = student;
         this.semester = semester;
         this.message = message;
     }
 
-    public int getId() {
-        return id;
+    public int getNotificationType() {
+        return notificationType;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setNotificationType(int notificationType) {
+        this.notificationType = notificationType;
+    }
+
+    public String getStudent() {
+        return student;
+    }
+
+    public void setStudent(String student) {
+        this.student = student;
     }
 
     public int getSemester() {
@@ -41,7 +51,8 @@ public class Notification {
     @Override
     public String toString() {
         return "Notification{" +
-                "id=" + id +
+                "notificationType=" + notificationType +
+                ", student='" + student + '\'' +
                 ", semester=" + semester +
                 ", message='" + message + '\'' +
                 '}';

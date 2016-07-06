@@ -3,10 +3,9 @@ package net.shagie.studentnotify.data;
 import java.util.List;
 
 public class Student {
-    private String id;
+    private String studentId;
     private List<Semester> grades;
     private String name;
-    private List<Notification> notifications;
 
     public Student() {
     }
@@ -19,12 +18,12 @@ public class Student {
         this.name = name;
     }
 
-    public String getId() {
-        return id;
+    public String getStudentId() {
+        return studentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
     public List<Semester> getGrades() {
@@ -35,21 +34,12 @@ public class Student {
         this.grades = grades;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
-    }
-
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
-    }
-
     @Override
     public String toString() {
         return "Student{" +
-                "id='" + id + '\'' +
+                "studentId='" + studentId + '\'' +
                 ", grades=" + grades +
                 ", name='" + name + '\'' +
-                ", notifications=" + notifications +
                 '}';
     }
 }

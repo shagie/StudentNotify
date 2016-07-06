@@ -1,5 +1,5 @@
 !net.shagie.studentnotify.data.Student
-id:
+studentId:
   005
 grades:
   - !net.shagie.studentnotify.data.Semester
@@ -8,8 +8,3 @@ grades:
     math: A
 name:
   Doug
-notifications:
-  - !net.shagie.studentnotify.data.Notification
-    id: 1
-    semester: 1
-    message: enrolled

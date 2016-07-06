@@ -5,7 +5,7 @@ import net.shagie.studentnotify.data.Semester
 import net.shagie.studentnotify.data.Notification
 import net.shagie.studentnotify.data.NotifyIds
 
-global java.util.List notifications;
+global java.util.List newEvents;
 
 dialect "mvel"
 
@@ -22,12 +22,17 @@ rule "last semester"
             grades != null,
             $g : grades,
             $l : grades.get(grades.size() - 1),
-            $n : notifications
+            $studentId : studentId
         )
-        not Notification(id == NotifyIds.GPA, semester == $g.size()) from $n
+        not Notification(
+            student == $studentId,
+            notificationType == NotifyIds.GPA,
+            semester == $g.size()
+        )
         Semester( $gpa : ((reading.score + writing.score + math.score) / 3)) from $l
     then
-        notifications.add(new Notification(NotifyIds.GPA,
+        newEvents.add(new Notification(NotifyIds.GPA,
+            $s.getStudentId(),
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "gpa " + $gpa));
 end
@@ -38,13 +43,18 @@ rule "sports eligibility"
             grades != null,
             $g : grades,
             $l : grades.get(grades.size() - 1),
-            $n : notifications
+            $studentId : studentId
         )
-        not Notification(id == NotifyIds.SPORTS_ELIGIBILITY, semester == $g.size()) from $n
+        not Notification(
+            student == $studentId,
+            notificationType == NotifyIds.SPORTS_ELIGIBILITY,
+            semester == $g.size()
+        )
         Semester ( ((reading.score + writing.score + math.score) / 3) > 2.5 ) from $l
         Semester ( reading.score > 1, writing.score > 1, math.score > 1 ) from $l
     then
-        notifications.add(new Notification(NotifyIds.SPORTS_ELIGIBILITY,
+        newEvents.add(new Notification(NotifyIds.SPORTS_ELIGIBILITY,
+            $s.getStudentId(),
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "sports eligibility " + $s.getName()));
 end

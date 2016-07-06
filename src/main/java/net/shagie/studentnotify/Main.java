@@ -39,22 +39,28 @@ public class Main {
         KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
         knowledgeBase.addKnowledgePackages(builder.getKnowledgePackages());
 
+        List<Notification> notifications = getAllNotifications();
+
         for(Student student : getAllStudents()) {
-            List<Notification> notifications = new LinkedList<>();
+            List<Notification> newEvents = new LinkedList<>();
 
             StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
-            ksession.setGlobal("notifications", notifications);
+            ksession.setGlobal("newEvents", newEvents);
+
 //          ksession.addEventListener( new DebugAgendaEventListener() );
 //          ksession.addEventListener( new DebugWorkingMemoryEventListener() );
 
             KnowledgeRuntimeLogger logger =
-                    KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getId());
+                    KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getStudentId());
 
             ksession.insert(student);
-            System.out.println("Student: " + student.getId() + " " + student.getName());
+            for(Notification n : notifications) {
+                ksession.insert(n);
+            }
+            System.out.println("Student: " + student.getStudentId() + " " + student.getName());
             ksession.fireAllRules();
 
-            for(Notification notification : notifications) {
+            for(Notification notification : newEvents) {
                 System.out.println(notification);
             }
             System.out.println("----------------");
@@ -63,12 +69,31 @@ public class Main {
         }
     }
 
-    private static List<Student> getAllStudents()  {
-        File dir;
-        File[] files = new File[0];
-        URL path = ClassLoader.getSystemResource("students");
+    private static List<Notification> getAllNotifications() {
+        List<Notification> rv = new ArrayList<>();
+
+        URL path = ClassLoader.getSystemResource("data/notifications/notifications.yaml");
         try {
-            dir = new File(path.toURI());
+            File file = new File(path.toURI());
+            YamlReader reader = new YamlReader(new FileReader(file));
+            rv = reader.read(rv.getClass(), Notification.class);
+        } catch (YamlException e) {
+            System.err.println("Couldn't parse " + path.toString());
+            System.err.println(e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + path.toString());
+        } catch (URISyntaxException e) {
+            System.err.println("Exception: " + e);
+        }
+
+        return rv;
+    }
+
+    private static List<Student> getAllStudents()  {
+        File[] files = new File[0];
+        URL path = ClassLoader.getSystemResource("data/students");
+        try {
+            File dir = new File(path.toURI());
             files = dir.listFiles();
             if(files == null) {
                 return new LinkedList<>();

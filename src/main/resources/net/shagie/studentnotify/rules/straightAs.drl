@@ -7,7 +7,7 @@ import net.shagie.studentnotify.data.NotifyIds
 import net.shagie.studentnotify.data.Grade
 import java.util.*
 
-global java.util.List notifications;
+global java.util.List newEvents;
 
 dialect "mvel"
 
@@ -18,12 +18,17 @@ rule "straight As"
         $s : Student(
             grades != null,
             $g : grades,
-            $n : notifications
+            $studentId : studentId
         )
         not Semester(reading != Grade.A || writing != Grade.A || math != Grade.A) from $g
-        not Notification(id == NotifyIds.STRAIGHT_AS, semester == $g.size()) from $n
+        not Notification(
+            student == $studentId,
+            notificationType == NotifyIds.STRAIGHT_AS,
+            semester == $g.size()
+        )
     then
-        notifications.add(new Notification(NotifyIds.STRAIGHT_AS,
+        newEvents.add(new Notification(NotifyIds.STRAIGHT_AS,
+            $s.getStudentId(),
             ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
             "allAs " + $s.getName()));
 end
