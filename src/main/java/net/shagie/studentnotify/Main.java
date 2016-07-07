@@ -12,7 +12,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.StatelessKnowledgeSession;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,39 +39,36 @@ public class Main {
 
         KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
         knowledgeBase.addKnowledgePackages(builder.getKnowledgePackages());
+        StatelessKnowledgeSession ksession = knowledgeBase.newStatelessKnowledgeSession();
 
-        List<Notification> notifications = getAllNotifications();
+        Deque facts = getAllNotifications();
+        List<Notification> newEvents = new LinkedList<>();
+        ksession.setGlobal("newEvents", newEvents);
+
+//      ksession.addEventListener( new DebugAgendaEventListener() );
+//      ksession.addEventListener( new DebugWorkingMemoryEventListener() );
 
         for(Student student : getAllStudents()) {
-            List<Notification> newEvents = new LinkedList<>();
-
-            StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
-            ksession.setGlobal("newEvents", newEvents);
-
-//          ksession.addEventListener( new DebugAgendaEventListener() );
-//          ksession.addEventListener( new DebugWorkingMemoryEventListener() );
+            facts.push(student);
 
             KnowledgeRuntimeLogger logger =
                     KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getStudentId());
 
-            ksession.insert(student);
-            for(Notification n : notifications) {
-                ksession.insert(n);
-            }
             System.out.println("Student: " + student.getStudentId() + " " + student.getName());
-            ksession.fireAllRules();
+            ksession.execute(facts);
 
             for(Notification notification : newEvents) {
                 System.out.println(notification);
             }
             System.out.println("----------------");
+            newEvents.clear();
+            facts.pop();
             logger.close();
-            ksession.dispose();
         }
     }
 
-    private static List<Notification> getAllNotifications() {
-        List<Notification> rv = new ArrayList<>();
+    private static Deque<Notification> getAllNotifications() {
+        Deque<Notification> rv = new LinkedList<>();
 
         URL path = ClassLoader.getSystemResource("data/notifications/notifications.yaml");
         try {
