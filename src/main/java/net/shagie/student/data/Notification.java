@@ -1,4 +1,4 @@
-package net.shagie.studentnotify.data;
+package net.shagie.student.data;
 
 public class Notification {
     private int notificationType;

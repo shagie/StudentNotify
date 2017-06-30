@@ -1,34 +1,34 @@
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 1
   student: 001
   semester: 1
   message: enrolled
 
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 2
   student: 001
   semester: 1
   message: straightAs
 
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 1
   student: 002
   semester: 1
   message: enrolled
 
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 3
   student: 004
   semester: 1
   message: transfer
 
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 1
   student: 005
   semester: 1
   message: enrolled
 
-- !net.shagie.studentnotify.data.Notification
+- !net.shagie.student.data.Notification
   notificationType: 1
   student: 006
   semester: 1

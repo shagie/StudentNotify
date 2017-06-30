@@ -1,8 +1,8 @@
-!net.shagie.studentnotify.data.Student
+!net.shagie.student.data.Student
 studentId:
   004
 grades:
-  - !net.shagie.studentnotify.data.Semester
+  - !net.shagie.student.data.Semester
     reading: A
     writing: A
     math: A

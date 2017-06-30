@@ -1,9 +1,9 @@
-package net.shagie.studentnotify;
+package net.shagie.student.notify;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
-import net.shagie.studentnotify.data.Notification;
-import net.shagie.studentnotify.data.Student;
+import net.shagie.student.data.Notification;
+import net.shagie.student.data.Student;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -24,7 +24,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Main {
+public class RulesMain {
     private final static String RULE_PACKAGE = "net/shagie/studentnotify/rules/";
 
     public static void main(String[] args) {

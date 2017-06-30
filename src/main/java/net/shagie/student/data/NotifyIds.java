@@ -1,4 +1,4 @@
-package net.shagie.studentnotify.data;
+package net.shagie.student.data;
 
 public final class NotifyIds {
     public final static int ENROLL = 1;

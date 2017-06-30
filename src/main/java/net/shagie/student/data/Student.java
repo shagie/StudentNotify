@@ -1,4 +1,4 @@
-package net.shagie.studentnotify.data;
+package net.shagie.student.data;
 
 import java.util.List;
 
