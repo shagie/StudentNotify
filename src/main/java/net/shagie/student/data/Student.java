@@ -4,8 +4,8 @@ import java.util.List;
 
 public class Student {
     private String studentId;
-    private List<Semester> grades;
     private String name;
+    private List<Semester> grades;
 
     public Student() {
     }
@@ -38,8 +38,8 @@ public class Student {
     public String toString() {
         return "Student{" +
                 "studentId='" + studentId + '\'' +
-                ", grades=" + grades +
                 ", name='" + name + '\'' +
+                ", grades=" + grades +
                 '}';
     }
 }
