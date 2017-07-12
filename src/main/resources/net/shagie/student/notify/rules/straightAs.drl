@@ -17,12 +17,13 @@ rule "straight As"
     when
         $s : Student(
             grades != null,
+            grades.size() > 0,
             $g : grades,
             $studentId : studentId
         )
         not Semester(reading != Grade.A || writing != Grade.A || math != Grade.A) from $g
         not Notification(
-            student == $studentId,
+            studentId == $studentId,
             notificationType == NotifyIds.STRAIGHT_AS,
             semester == $g.size()
         )

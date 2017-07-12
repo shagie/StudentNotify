@@ -1,17 +1,18 @@
 package net.shagie.student.data;
 
-public class Notification {
+public class Notification implements Comparable<Notification> {
     private int notificationType;
-    private String student;
+    private String studentId;
     private int semester;
     private String message;
+    private final String recordType = "notification";
 
     public Notification() {
     }
 
-    public Notification(int notificationType, String student, int semester, String message) {
+    public Notification(int notificationType, String studentId, int semester, String message) {
         this.notificationType = notificationType;
-        this.student = student;
+        this.studentId = studentId;
         this.semester = semester;
         this.message = message;
     }
@@ -22,14 +23,6 @@ public class Notification {
 
     public void setNotificationType(int notificationType) {
         this.notificationType = notificationType;
-    }
-
-    public String getStudent() {
-        return student;
-    }
-
-    public void setStudent(String student) {
-        this.student = student;
     }
 
     public int getSemester() {
@@ -48,13 +41,37 @@ public class Notification {
         this.message = message;
     }
 
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
+
+    @SuppressWarnings("unused")
+    public String getRecordType() {
+        return recordType;
+    }
+
     @Override
     public String toString() {
         return "Notification{" +
                 "notificationType=" + notificationType +
-                ", student='" + student + '\'' +
+                ", studentId='" + studentId + '\'' +
                 ", semester=" + semester +
                 ", message='" + message + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Notification that) {
+        if (this.studentId.compareTo(that.studentId) != 0) {
+            return this.studentId.compareTo(that.studentId);
+        }
+        if (Integer.valueOf(semester).compareTo(that.semester) != 0) {
+            return Integer.valueOf(semester).compareTo(that.semester);
+        }
+        return Integer.valueOf(this.notificationType).compareTo(that.notificationType);
     }
 }

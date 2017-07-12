@@ -20,12 +20,13 @@ rule "last semester"
     when
         $s : Student(
             grades != null,
+            grades.size() > 0,
             $g : grades,
             $l : grades.get(grades.size() - 1),
             $studentId : studentId
         )
         not Notification(
-            student == $studentId,
+            studentId == $studentId,
             notificationType == NotifyIds.GPA,
             semester == $g.size()
         )
@@ -41,12 +42,13 @@ rule "sports eligibility"
     when
         $s : Student(
             grades != null,
+            grades.size() > 0,
             $g : grades,
             $l : grades.get(grades.size() - 1),
             $studentId : studentId
         )
         not Notification(
-            student == $studentId,
+            studentId == $studentId,
             notificationType == NotifyIds.SPORTS_ELIGIBILITY,
             semester == $g.size()
         )

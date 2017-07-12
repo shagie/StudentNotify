@@ -1,8 +1,7 @@
 package net.shagie.student.gen;
 
-import net.shagie.student.data.Grade;
-import net.shagie.student.data.Semester;
-import net.shagie.student.data.Student;
+import net.shagie.student.couch.DataAccess;
+import net.shagie.student.data.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -36,7 +35,7 @@ public class GenMain {
 
         int id = 1;
         final int idmax = (int) (Math.log10(lines.size()) + 1);
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("size:   " + lines.size());
             LOG.debug("log10:  " + idmax);
         }
@@ -45,11 +44,11 @@ public class GenMain {
         final int gradeCount = grades.size();
 
         for (String line : lines) {
-            String[] nameSplit = line.split("\\t"); // TODO firstname vs lastname
+            String[] nameSplit = line.split("\\t");
             Student s = new Student();
-            s.setName(nameSplit[0]);
+            s.setName(new Name(nameSplit[0], nameSplit[1]));
             s.setStudentId(StringUtils.leftPad(Integer.toString(id), idmax, "0"));
-            int enrolled = rand.nextInt(4); // semesters enrolled
+            int enrolled = rand.nextInt(2); // semesters enrolled
             List<Semester> semesters = new ArrayList<>(enrolled);
             for (int i = 0; i < enrolled; i++) {
                 Semester sem = new Semester();
@@ -62,7 +61,17 @@ public class GenMain {
             s.setGrades(semesters);
 
             System.out.println(s.toString());
+            DataAccess.addStudent(s);
+
+            if (enrolled > 0) {
+                Notification note = new Notification();
+                note.setNotificationType(NotifyIds.ENROLL);
+                note.setSemester(0);
+                note.setStudentId(s.getStudentId());
+                DataAccess.addNotification(s, note);
+            }
             id += 1;
         }
+
     }
 }

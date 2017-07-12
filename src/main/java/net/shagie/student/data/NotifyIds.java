@@ -7,5 +7,6 @@ public final class NotifyIds {
     public final static int SPORTS_ELIGIBILITY = 4;
     public final static int GPA = 5;
 
-    private NotifyIds() {}
+    private NotifyIds() {
+    }
 }

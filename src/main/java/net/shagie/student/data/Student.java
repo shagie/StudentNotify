@@ -1,20 +1,26 @@
 package net.shagie.student.data;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Student {
     private String studentId;
-    private String name;
+    private Name name;
     private List<Semester> grades;
+    /**
+     * couch recordType field
+     */
+    private final String recordType = "student";
 
     public Student() {
+        grades = new LinkedList<>();
     }
 
-    public String getName() {
+    public Name getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(Name name) {
         this.name = name;
     }
 
@@ -32,14 +38,23 @@ public class Student {
 
     public void setGrades(List<Semester> grades) {
         this.grades = grades;
+        if (grades == null) {
+            this.grades = new LinkedList<>();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public String getRecordType() {
+        return recordType;
     }
 
     @Override
     public String toString() {
         return "Student{" +
                 "studentId='" + studentId + '\'' +
-                ", name='" + name + '\'' +
+                ", name=" + name +
                 ", grades=" + grades +
+                ", recordType='" + recordType + '\'' +
                 '}';
     }
 }

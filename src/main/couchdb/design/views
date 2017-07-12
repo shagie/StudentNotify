@@ -1,0 +1,16 @@
+{
+  "_id": "_design/views",
+  "language": "javascript",
+  "views": {
+    "byId": {
+      "map": "function(doc) {\n  if(doc.recordType === \"student\") {\n    emit(doc.studentId, doc);\n  }\n}"
+    },
+    "studentCount": {
+      "map": "function(doc) {\n  if(doc.recordType === \"student\") {\n    emit(doc.id, 1);\n  }\n}",
+      "reduce": "_count"
+    },
+    "notifications": {
+      "map": "function(doc) {\n  if(doc.recordType === \"notification\") {\n    emit(doc.studentId, doc);\n  }\n}"
+    }
+  }
+}

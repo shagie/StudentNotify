@@ -15,7 +15,7 @@ dialect "mvel"
 rule "enrolled"
     when
         $s : Student( $studentId : studentId)
-        not Notification( student == $studentId, notificationType == NotifyIds.ENROLL )
+        not Notification( studentId == $studentId, notificationType == NotifyIds.ENROLL )
     then
         newEvents.add(new Notification(NotifyIds.ENROLL,
             $s.getStudentId(),

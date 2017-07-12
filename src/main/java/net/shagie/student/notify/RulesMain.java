@@ -1,7 +1,6 @@
 package net.shagie.student.notify;
 
-import com.esotericsoftware.yamlbeans.YamlException;
-import com.esotericsoftware.yamlbeans.YamlReader;
+import net.shagie.student.couch.DataAccess;
 import net.shagie.student.data.Notification;
 import net.shagie.student.data.Student;
 import org.drools.KnowledgeBase;
@@ -12,24 +11,21 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.runtime.StatefulKnowledgeSession;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class RulesMain {
-    private final static String RULE_PACKAGE = "net/shagie/studentnotify/rules/";
+    private final static String RULE_PACKAGE = "net/shagie/student/notify/rules/";
+    private final static int INCR = 10;
 
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        for (String ruleFile : getAllRules()) {
+        List<String> rules = getAllRules();
+        for (String ruleFile : rules) {
             builder.add(ResourceFactory.newClassPathResource(RULE_PACKAGE + ruleFile), ResourceType.DRL);
         }
 
@@ -39,89 +35,43 @@ public class RulesMain {
 
         KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
         knowledgeBase.addKnowledgePackages(builder.getKnowledgePackages());
-        StatelessKnowledgeSession ksession = knowledgeBase.newStatelessKnowledgeSession();
 
-        Deque facts = getAllNotifications();
-        List<Notification> newEvents = new LinkedList<>();
-        ksession.setGlobal("newEvents", newEvents);
+        int count = DataAccess.getStudentCount();
+        for (int i = 0; i < count; i += INCR) {
+            List<Student> students = DataAccess.getStudents(INCR, i);
+            for (Student student : students) {
+                List<Notification> newEvents = new LinkedList<>();
 
-//      ksession.addEventListener( new DebugAgendaEventListener() );
-//      ksession.addEventListener( new DebugWorkingMemoryEventListener() );
+                StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
+                ksession.setGlobal("newEvents", newEvents);
 
-        for(Student student : getAllStudents()) {
-            facts.push(student);
+                ksession.insert(student);
+                for (Notification pastNotification : DataAccess.getNotifications(student)) {
+                    ksession.insert(pastNotification);
+                }
 
-            KnowledgeRuntimeLogger logger =
-                    KnowledgeRuntimeLoggerFactory.newFileLogger(ksession, "log/notify_" + student.getStudentId());
+                KnowledgeRuntimeLogger logger =
+                        KnowledgeRuntimeLoggerFactory.newFileLogger(ksession,
+                                "log/notify_" + student.getStudentId());
 
-            System.out.println("Student: " + student.getStudentId() + " " + student.getName());
-            ksession.execute(facts);
+                System.out.println("Student: " + student.getStudentId() + " " + student.getName());
+                ksession.fireAllRules();
 
-            for(Notification notification : newEvents) {
-                System.out.println(notification);
+                for (Notification notification : newEvents) {
+                    System.out.println(notification);
+                }
+                System.out.println("----------------");
+                logger.close();
+                ksession.dispose();
             }
-            System.out.println("----------------");
-            newEvents.clear();
-            facts.pop();
-            logger.close();
         }
     }
 
-    private static Deque<Notification> getAllNotifications() {
-        Deque<Notification> rv = new LinkedList<>();
-
-        URL path = ClassLoader.getSystemResource("data/notifications/notifications.yaml");
-        try {
-            File file = new File(path.toURI());
-            YamlReader reader = new YamlReader(new FileReader(file));
-            rv = reader.read(rv.getClass(), Notification.class);
-        } catch (YamlException e) {
-            System.err.println("Couldn't parse " + path.toString());
-            System.err.println(e.getMessage());
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found: " + path.toString());
-        } catch (URISyntaxException e) {
-            System.err.println("Exception: " + e);
-        }
-
-        return rv;
-    }
-
-    private static List<Student> getAllStudents()  {
-        File[] files = new File[0];
-        URL path = ClassLoader.getSystemResource("data/students");
-        try {
-            File dir = new File(path.toURI());
-            files = dir.listFiles();
-            if(files == null) {
-                return new LinkedList<>();
-            }
-        } catch (URISyntaxException e) {
-            System.err.println("Exception: " + e);
-        }
-
-        List<Student> rv = new ArrayList<>(files.length);
-
-        for (final File file : files) {
-            try {
-                YamlReader reader = new YamlReader(new FileReader(file));
-                Student student = reader.read(Student.class);
-//              System.out.println(student.toString());
-                rv.add(student);
-            } catch (FileNotFoundException e) {
-                System.err.println("File not found: " + file.getName());
-            } catch (YamlException e) {
-                System.err.println("Couldn't parse " + file.getName());
-                System.err.println(e.getMessage());
-            }
-        }
-        return rv;
-    }
 
     private static List<String> getAllRules() {
         URL dir = ClassLoader.getSystemClassLoader().getResource(RULE_PACKAGE);
         List<String> rv = new LinkedList<>();
-        if(dir == null) {
+        if (dir == null) {
             return rv;
         }
 
@@ -129,8 +79,8 @@ public class RulesMain {
             File fDir = new File(dir.toURI());
             File[] files = fDir.listFiles();
             if (files != null) {
-                for(File file : files) {
-                    if(file.getName().endsWith(".drl")) {
+                for (File file : files) {
+                    if (file.getName().endsWith(".drl")) {
                         rv.add(file.getName());
                     }
                 }
@@ -141,5 +91,4 @@ public class RulesMain {
 
         return rv;
     }
-
 }
