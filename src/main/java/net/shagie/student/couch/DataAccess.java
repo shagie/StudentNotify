@@ -39,28 +39,9 @@ public class DataAccess {
     }
 
     public static List<Student> getStudents(int count, int offset) {
-        Type responseType = new TypeToken<ResponseWrapper<Student>>() {
-        }.getType();
-        List<Student> rv = Collections.emptyList();
         HttpGet get = new HttpGet(serverProp.getProperty("server.url")
                 + "_design/views/_view/byId?limit=" + count + "&skip=" + offset);
-        try (CloseableHttpClient client = HttpClients.createDefault();  // TODO extract
-             CloseableHttpResponse response = client.execute(get)) {
-            StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
-                ResponseWrapper<Student> results =
-                        gson.fromJson(EntityUtils.toString(response.getEntity()), responseType);
-                rv = results.getRows().stream()
-                        .map(RowWrapper::getValue)
-                        .collect(Collectors.toList());
-            } else {
-                System.out.println("got non-200 response: " + status.getStatusCode());
-            }
-        } catch (IOException e) {
-            LOG.error("Got an IO Exception accessing couch server", e);
-        }
-
-        return rv;
+        return getStudentList(get);
     }
 
     public static List<Notification> getNotifications(Student student) {
@@ -157,4 +138,36 @@ public class DataAccess {
         doPost(post);
     }
 
+    public static Student getStudent(String studentId) {
+        HttpGet get = new HttpGet(serverProp.getProperty("server.url")
+                + "_design/views/_view/byId?key=%22" + studentId + "%22");
+        // XXX encode properly
+        List<Student> rv = getStudentList(get);
+        if (rv.isEmpty()) {
+            return null;
+        } else {
+            return rv.get(0);
+        }
+    }
+
+    private static List<Student> getStudentList(HttpGet get) {
+        List<Student> rv = Collections.emptyList();
+        Type responseType = new TypeToken<ResponseWrapper<Student>>() {}.getType();
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = client.execute(get)) {
+            StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() == 200) {
+                ResponseWrapper<Student> results =
+                        gson.fromJson(EntityUtils.toString(response.getEntity()), responseType);
+                rv = results.getRows().stream()
+                        .map(RowWrapper::getValue)
+                        .collect(Collectors.toList());
+            } else {
+                System.out.println("got non-200 response: " + status.getStatusCode());
+            }
+        } catch (IOException e) {
+            LOG.error("Got an IO Exception accessing couch server", e);
+        }
+        return rv;
+    }
 }
