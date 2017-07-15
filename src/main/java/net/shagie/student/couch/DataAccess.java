@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,10 +47,15 @@ public class DataAccess {
 
     public static List<Notification> getNotifications(Student student) {
         List<Notification> rv = Collections.emptyList();
+        String key = "";
+        try {
+            key = URLEncoder.encode("\"" + student.getStudentId() + "\"", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Unknown encoding", e);
+        }
         HttpGet get = new HttpGet(
                 serverProp.getProperty("server.url")
-                        + "_design/views/_view/notifications?key=%22" + student.getStudentId() + "%22");
-        // XXX encode properly
+                        + "_design/views/_view/notifications?key=" + key);
 
         Type responseType = new TypeToken<ResponseWrapper<Notification>>() {
         }.getType(); // TODO extract
@@ -139,9 +145,15 @@ public class DataAccess {
     }
 
     public static Student getStudent(String studentId) {
+        String key = "";
+        try {
+            key = URLEncoder.encode("\"" + studentId + "\"", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Unknown encoding", e);
+        }
+
         HttpGet get = new HttpGet(serverProp.getProperty("server.url")
-                + "_design/views/_view/byId?key=%22" + studentId + "%22");
-        // XXX encode properly
+                + "_design/views/_view/byId?key=" + key);
         List<Student> rv = getStudentList(get);
         if (rv.isEmpty()) {
             return null;
