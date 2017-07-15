@@ -58,6 +58,7 @@ public class RulesMain {
 
                 for (Notification notification : newEvents) {
                     System.out.println(notification);
+                    DataAccess.addNotification(student, notification);
                 }
                 System.out.println("----------------");
 //              logger.close();
