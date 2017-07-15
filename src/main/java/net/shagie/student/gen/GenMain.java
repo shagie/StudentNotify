@@ -68,6 +68,7 @@ public class GenMain {
                 note.setNotificationType(NotifyIds.ENROLL);
                 note.setSemester(0);
                 note.setStudentId(s.getStudentId());
+                note.setMessage("initial enrolment");
                 DataAccess.addNotification(s, note);
             }
             id += 1;
