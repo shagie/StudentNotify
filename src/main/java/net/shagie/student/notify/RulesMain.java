@@ -9,8 +9,6 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import java.io.File;
@@ -20,7 +18,7 @@ import java.util.*;
 
 public class RulesMain {
     private final static String RULE_PACKAGE = "net/shagie/student/notify/rules/";
-    private final static int INCR = 10;
+    private final static int INCREMENT = 10;
 
     public static void main(String[] args) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -37,12 +35,13 @@ public class RulesMain {
         knowledgeBase.addKnowledgePackages(builder.getKnowledgePackages());
 
         int count = DataAccess.getStudentCount();
-        for (int i = 0; i < count; i += INCR) {
-            List<Student> students = DataAccess.getStudents(INCR, i);
+        for (int i = 0; i < count; i += INCREMENT) {
+            List<Student> students = DataAccess.getStudents(INCREMENT, i);
             for (Student student : students) {
                 List<Notification> newEvents = new LinkedList<>();
 
                 StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
+//              ksession.addEventListener( new org.drools.event.rule.DebugWorkingMemoryEventListener() );
                 ksession.setGlobal("newEvents", newEvents);
 
                 ksession.insert(student);
@@ -50,9 +49,9 @@ public class RulesMain {
                     ksession.insert(pastNotification);
                 }
 
-                KnowledgeRuntimeLogger logger =
-                        KnowledgeRuntimeLoggerFactory.newFileLogger(ksession,
-                                "log/notify_" + student.getStudentId());
+//              KnowledgeRuntimeLogger logger =
+//                      KnowledgeRuntimeLoggerFactory.newFileLogger(ksession,
+//                              "log/notify_" + student.getStudentId());
 
                 System.out.println("Student: " + student.getStudentId() + " " + student.getName());
                 ksession.fireAllRules();
@@ -61,7 +60,7 @@ public class RulesMain {
                     System.out.println(notification);
                 }
                 System.out.println("----------------");
-                logger.close();
+//              logger.close();
                 ksession.dispose();
             }
         }
