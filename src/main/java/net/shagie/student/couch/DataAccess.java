@@ -5,9 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import net.shagie.student.data.Notification;
 import net.shagie.student.data.Student;
 import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -33,8 +31,8 @@ public class DataAccess {
         InputStream inStream = DataAccess.class.getClassLoader().getResourceAsStream("server.properties");
         try {
             serverProp.load(inStream);
-        } catch (IOException ioex) {
-            LOG.error("Got io exception loading server.properties from classpath", ioex);
+        } catch (IOException ioException) {
+            LOG.error("Got io exception loading server.properties from classpath", ioException);
         }
         gson = new Gson();
     }
@@ -95,14 +93,14 @@ public class DataAccess {
         doPost(post);
     }
 
-    private static void doPost(HttpPost post) {
+    private static void doPost(HttpEntityEnclosingRequestBase post) {
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(post)) {
             StatusLine status = response.getStatusLine();
             if (status.getStatusCode() == 200) {
-                System.out.println(status.getStatusCode());
+                System.out.println("do Post: " + status.getStatusCode());
             } else {
-                System.out.println(status.getStatusCode());
+                System.out.println("do Post: " + status.getStatusCode());
             }
         } catch (IOException e) {
             LOG.error("Got an IO Exception accessing couch server", e);
@@ -181,5 +179,22 @@ public class DataAccess {
             LOG.error("Got an IO Exception accessing couch server", e);
         }
         return rv;
+    }
+
+    public static void updateStudent(Student student) {
+        HttpPut put = new HttpPut(serverProp.getProperty("server.url") + "/" + student.getDocumentId());
+        put.setHeader("Referer", serverProp.getProperty("server.url"));
+        put.setHeader("Content-Type", "application/json");
+        StringEntity body = null;
+        try {
+            body = new StringEntity(gson.toJson(student));
+            body.setContentType("application/json");
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Got an IO Exception accessing converting student to json", e);
+            LOG.error(student.toString());
+        }
+        put.setEntity(body);
+
+        doPost(put);
     }
 }

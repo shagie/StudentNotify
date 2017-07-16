@@ -1,9 +1,15 @@
 package net.shagie.student.data;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class Student {
+    @SerializedName("_id")
+    private String documentId;
+    @SerializedName("_rev")
+    private String revision;
     private String studentId;
     private Name name;
     private List<Semester> grades;
@@ -41,6 +47,14 @@ public class Student {
         if (grades == null) {
             this.grades = new LinkedList<>();
         }
+    }
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public String getRevision() {
+        return revision;
     }
 
     @SuppressWarnings("unused")
