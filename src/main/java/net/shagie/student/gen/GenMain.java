@@ -34,10 +34,10 @@ public class GenMain {
         }
 
         int id = 1;
-        final int idmax = (int) (Math.log10(lines.size()) + 1);
+        final int idMax = (int) (Math.log10(lines.size()) + 1);
         if (LOG.isDebugEnabled()) {
             LOG.debug("size:   " + lines.size());
-            LOG.debug("log10:  " + idmax);
+            LOG.debug("log10:  " + idMax);
         }
 
         List<Grade> grades = Collections.unmodifiableList(Arrays.asList(Grade.values()));
@@ -47,7 +47,7 @@ public class GenMain {
             String[] nameSplit = line.split("\\t");
             Student s = new Student();
             s.setName(new Name(nameSplit[0], nameSplit[1]));
-            s.setStudentId(StringUtils.leftPad(Integer.toString(id), idmax, "0"));
+            s.setStudentId(StringUtils.leftPad(Integer.toString(id), idMax, "0"));
             int enrolled = rand.nextInt(2); // semesters enrolled
             List<Semester> semesters = new ArrayList<>(enrolled);
             for (int i = 0; i < enrolled; i++) {

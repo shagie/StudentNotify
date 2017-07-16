@@ -24,8 +24,8 @@ public class InitDb {
         InputStream inStream = DataAccess.class.getClassLoader().getResourceAsStream("server.properties");
         try {
             serverProp.load(inStream);
-        } catch (IOException ioex) {
-            LOG.error("Got io exception loading server.properties from classpath", ioex);
+        } catch (IOException ioException) {
+            LOG.error("Got io exception loading server.properties from classpath", ioException);
         }
     }
 
