@@ -43,6 +43,25 @@ public class DataAccess {
         return getStudentList(get);
     }
 
+    public static Student getStudent(String studentId) {
+        String key = "";
+        try {
+            key = URLEncoder.encode("\"" + studentId + "\"", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Unknown encoding", e);
+        }
+
+        HttpGet get = new HttpGet(serverProp.getProperty("server.url")
+                + "_design/views/_view/byId?key=" + key);
+        List<Student> rv = getStudentList(get);
+        if (rv.isEmpty()) {
+            return null;
+        } else {
+            return rv.get(0);
+        }
+    }
+
+
     public static List<Notification> getNotifications(Student student) {
         List<Notification> rv = Collections.emptyList();
         String key = "";
@@ -93,19 +112,6 @@ public class DataAccess {
         doPost(post);
     }
 
-    private static void doPost(HttpEntityEnclosingRequestBase post) {
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(post)) {
-            StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
-                System.out.println("do Post: " + status.getStatusCode());
-            } else {
-                System.out.println("do Post: " + status.getStatusCode());
-            }
-        } catch (IOException e) {
-            LOG.error("Got an IO Exception accessing couch server", e);
-        }
-    }
 
     public static int getStudentCount() {
         int rv = -1;
@@ -133,6 +139,15 @@ public class DataAccess {
         doPost(post);
     }
 
+    public static void updateStudent(Student student) {
+        HttpPut put = new HttpPut(serverProp.getProperty("server.url") + "/" + student.getDocumentId());
+        put.setHeader("Referer", serverProp.getProperty("server.url"));
+        put.setHeader("Content-Type", "application/json");
+        put.setEntity(studentToStringEntity(student));
+        doPost(put);
+    }
+
+
     private static StringEntity studentToStringEntity(Student student) {
         StringEntity body = null;
         try {
@@ -143,24 +158,6 @@ public class DataAccess {
             LOG.error(student.toString());
         }
         return body;
-    }
-
-    public static Student getStudent(String studentId) {
-        String key = "";
-        try {
-            key = URLEncoder.encode("\"" + studentId + "\"", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("Unknown encoding", e);
-        }
-
-        HttpGet get = new HttpGet(serverProp.getProperty("server.url")
-                + "_design/views/_view/byId?key=" + key);
-        List<Student> rv = getStudentList(get);
-        if (rv.isEmpty()) {
-            return null;
-        } else {
-            return rv.get(0);
-        }
     }
 
     private static List<Student> getStudentList(HttpGet get) {
@@ -184,11 +181,19 @@ public class DataAccess {
         return rv;
     }
 
-    public static void updateStudent(Student student) {
-        HttpPut put = new HttpPut(serverProp.getProperty("server.url") + "/" + student.getDocumentId());
-        put.setHeader("Referer", serverProp.getProperty("server.url"));
-        put.setHeader("Content-Type", "application/json");
-        put.setEntity(studentToStringEntity(student));
-        doPost(put);
+
+    private static void doPost(HttpEntityEnclosingRequestBase post) {
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = client.execute(post)) {
+            StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() == 200) {
+                System.out.println("do Post: " + status.getStatusCode());
+            } else {
+                System.out.println("do Post: " + status.getStatusCode());
+            }
+        } catch (IOException e) {
+            LOG.error("Got an IO Exception accessing couch server", e);
+        }
     }
+
 }
