@@ -79,14 +79,14 @@ public class DataAccess {
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(get)) {
             StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
+            if (isOk(status.getStatusCode())) {
                 ResponseWrapper<Notification> results =
                         gson.fromJson(EntityUtils.toString(response.getEntity()), responseType);
                 rv = results.getRows().stream()
                         .map(RowWrapper::getValue)
                         .collect(Collectors.toList());
             } else {
-                System.out.println("got non-200 response: " + status.getStatusCode());
+                LOG.warn("getNotifications non-200 response: " + status.getStatusCode());
             }
         } catch (IOException e) {
             LOG.error("Got an IO Exception accessing couch server", e);
@@ -109,7 +109,7 @@ public class DataAccess {
         }
         post.setEntity(body);
 
-        doPost(post);
+        doAddUpdate(post);
     }
 
 
@@ -119,11 +119,11 @@ public class DataAccess {
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(get)) {
             StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
+            if (isOk(status.getStatusCode())) {
                 Count results = gson.fromJson(EntityUtils.toString(response.getEntity()), Count.class);
                 rv = results.getRows().get(0).getValue();
             } else {
-                System.out.println("got non-200 response: " + status.getStatusCode());
+                LOG.warn("getStudentCount non-200 response: " + status.getStatusCode());
             }
         } catch (IOException e) {
             LOG.error("Got an IO Exception accessing couch server", e);
@@ -136,7 +136,7 @@ public class DataAccess {
         post.setHeader("Referer", serverProp.getProperty("server.url"));
         post.setHeader("Content-Type", "application/json");
         post.setEntity(studentToStringEntity(student));
-        doPost(post);
+        doAddUpdate(post);
     }
 
     public static void updateStudent(Student student) {
@@ -144,7 +144,7 @@ public class DataAccess {
         put.setHeader("Referer", serverProp.getProperty("server.url"));
         put.setHeader("Content-Type", "application/json");
         put.setEntity(studentToStringEntity(student));
-        doPost(put);
+        doAddUpdate(put);
     }
 
 
@@ -166,14 +166,14 @@ public class DataAccess {
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(get)) {
             StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
+            if (isOk(status.getStatusCode())) {
                 ResponseWrapper<Student> results =
                         gson.fromJson(EntityUtils.toString(response.getEntity()), responseType);
                 rv = results.getRows().stream()
                         .map(RowWrapper::getValue)
                         .collect(Collectors.toList());
             } else {
-                System.out.println("got non-200 response: " + status.getStatusCode());
+                LOG.warn("getStudentList NOT OK: " + status.getStatusCode());
             }
         } catch (IOException e) {
             LOG.error("Got an IO Exception accessing couch server", e);
@@ -182,18 +182,25 @@ public class DataAccess {
     }
 
 
-    private static void doPost(HttpEntityEnclosingRequestBase post) {
+    /**
+     * Do a put (or post) request to update the database.
+     * @param request PUT or POST request
+     */
+    private static void doAddUpdate(HttpEntityEnclosingRequestBase request) {
         try (CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(post)) {
+             CloseableHttpResponse response = client.execute(request)) {
             StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
-                System.out.println("do Post: " + status.getStatusCode());
+            if (isOk(status.getStatusCode())) {
+                LOG.info("doAddUpdate OK: " + status.getStatusCode());
             } else {
-                System.out.println("do Post: " + status.getStatusCode());
+                LOG.warn("doAddUpdate NOT OK: " + status.getStatusCode());
             }
         } catch (IOException e) {
             LOG.error("Got an IO Exception accessing couch server", e);
         }
     }
 
+    private static boolean isOk(int status) {
+        return status >= 200 && status <= 299;
+    }
 }
