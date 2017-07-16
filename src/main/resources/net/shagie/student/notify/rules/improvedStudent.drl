@@ -1,0 +1,47 @@
+package net.shagie.student.notify.rules;
+
+import net.shagie.student.data.Student
+import net.shagie.student.data.Semester
+import net.shagie.student.data.Notification
+import net.shagie.student.data.NotifyIds
+
+global java.util.List newEvents;
+
+dialect  "mvel"
+
+rule "improved student"
+    when
+        $s : Student(
+            grades != null,
+            grades.size() > 1,
+            $g : grades,
+            $l : grades.get(grades.size() - 1),
+            $p : grades.get(grades.size() - 2),
+            $studentId : studentId
+        )
+        not Notification(
+            studentId == $studentId,
+            notificationType == NotifyIds.IMPROVED,
+            semester == $g.size
+        )
+        Semester (
+            $lr : reading.score,
+            $lw : writing.score,
+            $lm : math.score,
+            $lgpa : ((reading.score + writing.score + math.score) / 3)
+        ) from $l
+        Semester (
+            $pr : reading.score,
+            $pw : writing.score,
+            $pm : math.score,
+            $pgpa : ((reading.score + writing.score + math.score) / 3)
+        ) from $p
+        eval ($lgpa > $pgpa)
+        eval ($lr >= $pr)
+        eval ($lw >= $pw)
+        eval ($lr >= $pr)
+    then
+        newEvents.add(new Notification(NotifyIds.IMPROVED,
+            $s.getStudentId(), $s.getGrades().size(),
+            "improved student " + $s.getName()));
+end

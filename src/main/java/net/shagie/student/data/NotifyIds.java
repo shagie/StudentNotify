@@ -6,6 +6,7 @@ public final class NotifyIds {
     public final static int TRANSFER = 3;
     public final static int SPORTS_ELIGIBILITY = 4;
     public final static int GPA = 5;
+    public final static int IMPROVED = 6;
 
     private NotifyIds() {
     }
