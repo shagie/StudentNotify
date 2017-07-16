@@ -129,6 +129,11 @@ public class DataAccess {
         HttpPost post = new HttpPost(serverProp.getProperty("server.url"));
         post.setHeader("Referer", serverProp.getProperty("server.url"));
         post.setHeader("Content-Type", "application/json");
+        post.setEntity(studentToStringEntity(student));
+        doPost(post);
+    }
+
+    private static StringEntity studentToStringEntity(Student student) {
         StringEntity body = null;
         try {
             body = new StringEntity(gson.toJson(student));
@@ -137,9 +142,7 @@ public class DataAccess {
             LOG.error("Got an IO Exception accessing converting student to json", e);
             LOG.error(student.toString());
         }
-        post.setEntity(body);
-
-        doPost(post);
+        return body;
     }
 
     public static Student getStudent(String studentId) {
@@ -185,16 +188,7 @@ public class DataAccess {
         HttpPut put = new HttpPut(serverProp.getProperty("server.url") + "/" + student.getDocumentId());
         put.setHeader("Referer", serverProp.getProperty("server.url"));
         put.setHeader("Content-Type", "application/json");
-        StringEntity body = null;
-        try {
-            body = new StringEntity(gson.toJson(student));
-            body.setContentType("application/json");
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("Got an IO Exception accessing converting student to json", e);
-            LOG.error(student.toString());
-        }
-        put.setEntity(body);
-
+        put.setEntity(studentToStringEntity(student));
         doPost(put);
     }
 }
