@@ -40,21 +40,21 @@ public class RulesMain {
             for (Student student : students) {
                 List<Notification> newEvents = new LinkedList<>();
 
-                StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
-//              ksession.addEventListener( new org.drools.event.rule.DebugWorkingMemoryEventListener() );
-                ksession.setGlobal("newEvents", newEvents);
+                StatefulKnowledgeSession kSession = knowledgeBase.newStatefulKnowledgeSession();
+//              kSession.addEventListener( new org.drools.event.rule.DebugWorkingMemoryEventListener() );
+                kSession.setGlobal("newEvents", newEvents);
 
-                ksession.insert(student);
+                kSession.insert(student);
                 for (Notification pastNotification : DataAccess.getNotifications(student)) {
-                    ksession.insert(pastNotification);
+                    kSession.insert(pastNotification);
                 }
 
 //              KnowledgeRuntimeLogger logger =
-//                      KnowledgeRuntimeLoggerFactory.newFileLogger(ksession,
+//                      KnowledgeRuntimeLoggerFactory.newFileLogger(kSession,
 //                              "log/notify_" + student.getStudentId());
 
                 System.out.println("Student: " + student.getStudentId() + " " + student.getName());
-                ksession.fireAllRules();
+                kSession.fireAllRules();
 
                 for (Notification notification : newEvents) {
                     System.out.println(notification);
@@ -62,7 +62,7 @@ public class RulesMain {
                 }
                 System.out.println("----------------");
 //              logger.close();
-                ksession.dispose();
+                kSession.dispose();
             }
         }
     }
