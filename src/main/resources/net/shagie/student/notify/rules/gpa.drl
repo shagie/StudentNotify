@@ -1,0 +1,32 @@
+package net.shagie.studentnotify.rules
+
+import net.shagie.student.data.Student
+import net.shagie.student.data.Semester
+import net.shagie.student.data.Notification
+import net.shagie.student.data.NotifyIds
+
+global java.util.List newEvents;
+
+dialect "mvel"
+
+rule "gpa"
+    when
+        $s : Student(
+            grades != null,
+            grades.size() > 0,
+            $g : grades,
+            $l : grades.get(grades.size() - 1),
+            $studentId : studentId
+        )
+        not Notification(
+            studentId == $studentId,
+            notificationType == NotifyIds.GPA,
+            semester == $g.size()
+        )
+        Semester( $gpa : ((reading.score + writing.score + math.score) / 3)) from $l
+    then
+        newEvents.add(new Notification(NotifyIds.GPA,
+            $s.getStudentId(),
+            ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
+            "gpa " + $gpa));
+end

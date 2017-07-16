@@ -9,34 +9,10 @@ global java.util.List newEvents;
 
 dialect "mvel"
 
-/* Rules related to the last semester.
- * GPA triggers every year and notifies the gpa
- * Sports elgibility triggers every year.
+/* Sports elgibility triggers every year.
  *   - Must have all Cs or better
  *   - Must have a GPA at least 2.5
  */
-
-rule "last semester"
-    when
-        $s : Student(
-            grades != null,
-            grades.size() > 0,
-            $g : grades,
-            $l : grades.get(grades.size() - 1),
-            $studentId : studentId
-        )
-        not Notification(
-            studentId == $studentId,
-            notificationType == NotifyIds.GPA,
-            semester == $g.size()
-        )
-        Semester( $gpa : ((reading.score + writing.score + math.score) / 3)) from $l
-    then
-        newEvents.add(new Notification(NotifyIds.GPA,
-            $s.getStudentId(),
-            ($s.getGrades() == null || $s.getGrades().isEmpty()) ? 0 : $s.getGrades().size(),
-            "gpa " + $gpa));
-end
 
 rule "sports eligibility"
     when
